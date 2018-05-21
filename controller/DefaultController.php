@@ -214,27 +214,47 @@ class DefaultController {
         } elseif(isset($_GET['redes'])) {
             //Cuando se va a calcular el valor de las redes. 
             if (isset($_GET['calcularRedes'])){
-                $temp = 100000000.0;  
-                //Se obtienen los valores de la base de datos. 
-                $datas = $this->model->obtenerRedes();
-                //Se calcula para cada valor recuperado de la base de datos. 
-                foreach($datas as $data) {
-                    //Se obtienen y convierten los valores para cada fila. 
-                    $capacidad = $data['Capacity_Ca'] == "High" ? 3 : $data['Capacity_Ca'] == "Medium" ? 2 : 1;
-                    $costo = $data['Costo_Co'] == "High" ? 3 : $data['Costo_Co'] == "Medium" ? 2 : 1;                   
-                    //Se obtiene la distancia euclidiana                    
-                    $result = sqrt(
-                          pow($data['Reliability_R'] - $_POST['confiabilidad'], 2)
-                        + pow($capacidad - $_POST['capacidad'], 2)
-                        + pow($data['Number_of_links_L'] - $_POST['enlaces'], 2)
-                        + pow($costo - $_POST['costo'], 2));
-                    //Se obtiene el valor mínimo 
-                    if($result<$temp){
+                //Se convierten los datos ingresados por el usuario del formulario.
+                //Son obtenidos valores equivalentes a la base de datos. 
+                $confiabilidad = $_POST['confiabilidad'];                
+                $enlaces = $_POST['enlaces'];                
+                $capacidad = $_POST['capacidad'];                
+                $costo = $_POST['costo'];                
+
+                //Se obtiene el indice resumen de los datos de las redes
+                $indices = $this->model->obtenerIndiceRedes();                
+                 //Son obtenidos los valores de ocurrencia para los determinados datos en la tabla de redes. 
+                $datas = $this->model->obtenerRedes($confiabilidad, $enlaces, $capacidad, $costo);
+                //Se obtienen los porcentajes del indice
+                $indiceRedes = $indices[0];
+                //Se obtiene el m de la formula
+                $m = $indiceRedes['M'];                
+                //Inicialización de variables de control             
+                $temp = 0;
+                $tipoRed = '';
+                $keyValues = array("Reliability_R", "Number_of_links_L", "Capacity_Ca", "Costo_Co");
+                //Se recorren los valores para cada clase
+                foreach ($datas as $data) {
+                    //Se obtiene el n de la clase
+                    $n = $data['n'];                
+                    //Se calcula la propierad a priori de la clase en cuestión
+                    $probabilidadPriori = $n/$m;                    
+                    $result = 1;
+                    //Se obtiene la productoria de los valores obtenidos de las ocurrencias para los valores de una determinada clase. 
+                    for ($i=0; $i<count($keyValues); $i++) {                                  
+                        $p = $indiceRedes[$keyValues[$i]];                           
+                        //Se calcula la formula por medio de bayes/naive
+                        $result *= ($data[$keyValues[$i]]+($m*$p)) / ($n+$m);                        
+                    }        
+                    //Se calcula el valor de la productoria de la clase por el valor de la probabilidad a priori
+                    $result = $result * $probabilidadPriori;                                                               
+                    //Se determina el valor máximo 
+                    if ($temp < $result) {
                         $temp = $result;
-                        //Se almacena la clase de la red temporalmente hasta recuperar el valor mínimo. 
-                        $tipoRed = $data['Class'];
+                        //Es encontrado el valor de la clase que corresponde. 
+                        $tipoRed = $data['Class'];                        
                     }
-                }                
+                }                                                
             }            
             include 'view/calcularRedes.php';
         } else {            
@@ -242,6 +262,3 @@ class DefaultController {
         }
     }
 }
-
-
-

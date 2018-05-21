@@ -56,16 +56,16 @@ Ingrese los datos en el formulario</font></font></p>
                 </td>
                 <td>
                     <select name="capacidad" class="form-control">
-                        <option value="1">Bajo</option>
-                        <option value="2">Medio</option>   
-                        <option value="3">Alto</option> 
+                        <option value="Low">Bajo</option>
+                        <option value="Medium">Medio</option>   
+                        <option value="High">Alto</option> 
                     </select>
                 </td> 
                 <td>
                     <select name="costo" class="form-control">
-                        <option value="1">Bajo</option>
-                        <option value="2">Medio</option>   
-                        <option value="3">Alto</option> 
+                        <option value="Low">Bajo</option>
+                        <option value="Medium">Medio</option>   
+                        <option value="High">Alto</option> 
                     </select>
                 </td>                
             </tr>

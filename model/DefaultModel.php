@@ -65,15 +65,30 @@ class DefaultModel {
         return $profesores;
     }
 
-    public function obtenerRedes() {
+    public function obtenerIndiceRedes () {
+        //Se ejecuta el procedimiento                
+        $procedimiento = "call sp_obtener_indice_redes";
+        $query = mysqli_query($this->conn, $procedimiento);        
+        $indiceProfesores = array();        
+        //Se obtienen los datos de la base de datos y se almacenan en un arreglo
+
+        while ($data = mysqli_fetch_assoc($query)) {            
+            array_push($indiceProfesores, $data);
+        }                        
+        $this->conn = $this->conexion->reconectar();
+        return $indiceProfesores;
+    }
+
+    public function obtenerRedes($relability, $numberOfLinks, $capacity, $costo) {
         //Se ejecuta el procedimiento
-        $procedimiento = "call sp_obtener_redes";
+        //$procedimiento = "call sp_obtener_redes";
+        $procedimiento = "call sp_calcular_red ('$relability', '$numberOfLinks', '$capacity', '$costo')";
         $query = mysqli_query($this->conn, $procedimiento);
-        $profesores = array();
+        $redes = array();
         //Se obtienen los datos de la base de datos y se almacenan en un arreglo
         while ($data = mysqli_fetch_assoc($query)) {
-            array_push($profesores, $data);
+            array_push($redes, $data);
         }        
-        return $profesores;
+        return $redes;
     }
 }
