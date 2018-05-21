@@ -34,16 +34,16 @@ Ingrese los datos en el formulario</font></font></p>
                 </td>
                 <td>
                 <select name="genero" class="form-control" style="float:left">
-                        <option value="1">Femenino</option>
-                        <option value="2">Masculino</option>    
-                        <option value="3">No indicado</option>    
+                        <option value="F">Femenino</option>
+                        <option value="M">Masculino</option>    
+                        <option value="NA">No indicado</option>    
                     </select>
                 </td>
                 <td>
                     <select name="autoevaluacion" class="form-control" style="float:left">
-                        <option value="1">Principiante</option>
-                        <option value="2">Intermedio</option>   
-                        <option value="3">Avanzado</option> 
+                        <option value="B">Principiante</option>
+                        <option value="I">Intermedio</option>   
+                        <option value="A">Avanzado</option> 
                     </select>
                 </td>                
             </tr>
@@ -73,16 +73,16 @@ Ingrese los datos en el formulario</font></font></p>
                 </td>
                 <td>
                 <select name="disciplina" class="form-control">
-                        <option value="1">Toma de desiciones</option>
-                        <option value="2">Diseño de redes</option>    
-                        <option value="3">Otra</option>    
+                        <option value="DM">Toma de desiciones</option>
+                        <option value="ND">Diseño de redes</option>    
+                        <option value="O">Otra</option>    
                     </select>
                 </td>
                 <td>
                     <select name="usoComputadoras" class="form-control">
-                        <option value="1">Bajo</option>
-                        <option value="2">Medio</option>   
-                        <option value="3">Alto</option> 
+                        <option value="L">Bajo</option>
+                        <option value="A">Medio</option>   
+                        <option value="H">Alto</option> 
                     </select>
                 </td>                
             </tr>
@@ -102,16 +102,16 @@ Ingrese los datos en el formulario</font></font></p>
             <tr>
                 <td>
                     <select name="habilidadWeb" class="form-control">
-                        <option value="1">Nunca</option>
-                        <option value="2">Algunas veces</option>
-                        <option value="3">Amenudo</option>
+                        <option value="N">Nunca</option>
+                        <option value="S">Algunas veces</option>
+                        <option value="O">Amenudo</option>
                     </select>
                 </td>
                 <td>
                     <select name="experienciaWeb" class="form-control">
-                        <option value="1">Nunca</option>
-                        <option value="2">Algunas veces</option>
-                        <option value="3">Amenudo</option>
+                        <option value="N">Nunca</option>
+                        <option value="S">Algunas veces</option>
+                        <option value="O">Amenudo</option>
                     </select>
                 </td>                             
             </tr>

@@ -45,15 +45,17 @@ Debe de seleccionar su estilo de aprendizaje de los cuatro usados su último pro
             </tr>
         </tbody>
     </table>   
-    <input value="Calcular" type="submit" class="btn btn-primary" style="width: 15%; float: left;" id="enviar">
-    <label  style="float: left; width: 20%;">Recinto</label>
-    <?php 
-        if(isset($recinto)){
-            ?>
-        <input maxlength="12" size="12" name="ESTILOFINAL" class="form-control" style="width:20%;" value="<?php echo $recinto; ?>">   
-    <?php
-        }
-        ?>        
+    <div style="width:90%;">
+        <input value="Calcular" type="submit" class="btn btn-primary" style="width: 15%; float: left;" id="enviar">
+        <label  style="float: left; width: 20%;">Recinto</label>
+        <?php 
+            if(isset($recinto)){
+                ?>
+            <input maxlength="12" size="12" name="ESTILOFINAL" class="form-control" style="width:20%;" value="<?php echo $recinto; ?>">   
+        <?php
+            }
+        ?>
+    </div>       
 </form>
 <?php 
     if (isset($activarJQuery)) {

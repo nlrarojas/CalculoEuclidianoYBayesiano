@@ -384,16 +384,18 @@ include_once 'header.php';
         </tbody>
     </table>
     <br>
-    <input value="Calcular" type="submit" class="form-control" style="width: 20%;" id="enviar">        
-    <br/><br/>
-    <label class="form-control" style="float: left; width: 20%;">Estilo</label><br/><br/>
-    <?php 
-        if(isset($estilo)){
-            ?>
-        <input maxlength="12" size="12" name="ESTILOFINAL" class="form-control" style="width:20%;" value="<?php echo $estilo; ?>">
-        <?php
-        }
-        ?> 
+    <div style="width: 40%" >
+        <input value="Calcular" type="submit" class="btn btn-primary" style="float: left;" id="enviar">        
+        
+        <label  style="float: center; ">Estilo</label>
+        <?php 
+            if(isset($estilo)){
+                ?>
+            <input maxlength="12" size="12" name="ESTILOFINAL" class="form-control" style="width:30%; float: right;" value="<?php echo $estilo; ?>">
+            <?php
+            }
+        ?>
+    </div> 
     <br>
 </form>
 </div>

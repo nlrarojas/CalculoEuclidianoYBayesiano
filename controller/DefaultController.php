@@ -160,39 +160,55 @@ class DefaultController {
         } elseif (isset($_GET['tipoProfesor'])) {
             //Cuando se va a calcular el estilo del profesor
             if(isset($_GET['calcularTipoProfesor'])) {
-                //Se obtiene los datos de los profesores de la base de datos
-                $datas = $this->model->obtenerProfesores(); 
-                $temp = 100000000.0;                 
-                //Se ejecuta para cada valor recuperado 
-                foreach ($datas as $data){
-                    //Se convierten y obtiene los valores para cada fila
-                    $valorEdadDB = $data['A'];                   
-                    $valorSexoDB = $data['B'] == "F" ? 1 : $data['B'] == "M" ? 2 : 3;                
-                    $valorAutoEvaluacionDB = $data['C'] == "B" ? 1 : $data['C'] == "I" ? 2 : 3;
-                    $vecesCursoDB = $data['D'];
-                    $valorDisciplinaDB = $data['E'] == "DM" ? 1 : $data['E'] == "ND" ? 2 : 3;
-                    $valorHabilidadComputadoras = $data['F'] == "L" ? 1 : $data['F'] == "A" ? 2 : 3;
-                    $valorHabilidadWEB = $data['G'] == "N" ? 1 : $data['G'] == "S" ? 2 : 3;
-                    $valorExperienciaWEB = $data['H'] == "N" ? 1 : $data['H'] == "S" ? 2 : 3;                      
-                    //Se calcula la distancia euclidiana
-                    $result = sqrt(
-                       pow($valorEdadDB - $_POST['edad'], 2) 
-                     + pow($valorSexoDB - $_POST['genero'], 2)
-                     + pow($valorAutoEvaluacionDB - $_POST['autoevaluacion'],2) 
-                     + pow($vecesCursoDB - $_POST['vecesImpartido'],2) 
-                     + pow($valorDisciplinaDB - $_POST['disciplina'],2)
-                     + pow($valorHabilidadComputadoras - $_POST['usoComputadoras'],2)
-                     + pow($valorHabilidadWEB - $_POST['habilidadWeb'],2)
-                     + pow($valorExperienciaWEB - $_POST['experienciaWeb'],2));
-                    //Se obtiene el valor mínimo
-                    if($result<$temp){
+                //Se convierten los datos ingresados por el usuario del formulario.
+                //Son obtenidos valores equivalentes a la base de datos. 
+                $edad = $_POST['edad'];                            
+                $genero = $_POST['genero'];                
+                $autoEvaluacion = $_POST['autoevaluacion'];                
+                $vecesImpartido = $_POST['vecesImpartido'];                 
+                $disciplina = $_POST['disciplina'];                
+                $usoComputadoras = $_POST['usoComputadoras'];                
+                $habilidadWeb = $_POST['habilidadWeb'];                    
+                $experienciaWeb = $_POST['experienciaWeb'];                
+                
+                //Se obtiene el indice resumen de los datos de la tabla de profesores
+                $indices = $this->model->obtenerIndiceProfesores();          
+                //Son obtenidos los valores de ocurrencia para los determinados datos en la tabla de profesores. 
+                $datas = $this->model->obtenerProfesores($edad, $genero, $autoevaluacion, $vecesImpartido,
+                    $disciplina, $usoComputadoras, $habilidadWeb, $experienciaWeb);                
+                
+                //Se obtienen los porcentajes del indice
+                $indiceProfesores = $indices[0];
+                //Se obtiene el m de la formula
+                $m = $indiceProfesores['m'];   
+                //Inicialización de variables de control             
+                $temp = 0;
+                $tipoProfesor = '';
+                //Se recorren los valores para cada clase
+                foreach ($datas as $data) {
+                    //Se obtiene el n de la clase
+                    $n = $data['n'];
+                    //Se calcula la propierad a priori de la clase en cuestión
+                    $probabilidadPriori = $n/$m;
+                    $result = 1;
+                    //Se obtiene la productoria de los valores obtenidos de las ocurrencias para los valores de una determinada clase. 
+                    for ($i='A'; $i<'H'; $i++) {
+                        $p = $indiceProfesores[$i];                        
+                        //Se calcula la formula por medio de bayes/naive
+                        $result *= ($data[$i]+($m*$p)) / ($n+$m);
+                    }        
+                    //Se calcula el valor de la productoria de la clase por el valor de la probabilidad a priori
+                    $result = $result * $probabilidadPriori;                                           
+                    //Se determina el valor máximo 
+                    if ($temp < $result) {
                         $temp = $result;
-                        //Se almacena el estilo del profesor temporalmente hasta alcanzar el valor mínimo.
+                        //Es encontrado el valor de la clase que corresponde. 
                         $tipoProfesor = $data['Class'];
                     }
                 }                        
-                $activarJQuery = true;   
-            }
+                //Variable para mostrarlo en pantalla                                             
+                $activarJQuery = true;                   
+            }            
             include 'view/obtenerTipoProfesor.php';
             //Cuando se solicita la vista del ejercicio 3.6
         } elseif(isset($_GET['redes'])) {
