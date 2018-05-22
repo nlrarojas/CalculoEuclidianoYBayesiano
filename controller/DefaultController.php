@@ -29,26 +29,43 @@ class DefaultController {
                 $ca = $_POST['c7'] + $_POST['c11'] + $_POST['c15'] + $_POST['c19'] + $_POST['c31'] + $_POST['c35'];
                 $ea = $_POST['c4'] + $_POST['c12'] + $_POST['c24'] + $_POST['c28'] + $_POST['c32'] + $_POST['c36'];
 
-                //Se suman las columnas y se obtienen los valores que serán comparados
-                //Se recuperan los datos de la tabla desde base de datos
-                $datas = $this->model->obtenerEstilosRecintos();
-                //Esta variable se inicializa en un valor alto para que sea remplazada por el valor menor en cada iteración
-                //El valor en ningún caso supero el número 20.
-                $temp = 10000000.0;
-                //Esta variable es el estilo obtenido de la base de datos. 
-                $estilo = "";
-                //Se validan los resultados recuperados con los ingresados por el cliente                
-                foreach($datas as $data){
-                    //Se aplica el algoritmo de distancia uclideana
-                    $result = sqrt(pow($data['EC'] - $ec, 2) + pow($data['CA'] - $ca, 2) + pow($data['OR'] - $or, 2) + pow($data['EA'] - $ea, 2));                
-                    //Se valida el resultado obtenido                    
-                    if ($result < $temp) {
-                        //Si es menor se rempleza hasta que se comparen todos los datos y quede el menor. 
+                //Se obtiene el indice resumen de los datos de la tabla recintoestilo
+                $indices = $this->model->obtenerIndiceRecintoEstilo();          
+                //Son obtenidos los valores de ocurrencia para los determinados datos en la tabla de profesores. 
+                $datas = $this->model->obtenerEstilosRecintos($ca, $ec, $ea, $or);
+                
+                //Se obtienen los porcentajes del indice
+                $indiceEstilosRecinto = $indices[0];
+                //Se obtiene el m de la formula
+                $m = $indiceEstilosRecinto['m'];   
+                //Inicialización de variables de control             
+                $temp = 0;
+                $estilo = '';
+                //Arreglo con los valores key de la tabla de la base de datos 
+                $keyRecintoEstilo = array('CA', 'EC', 'EA', 'OR');
+                //Se recorren los valores para cada clase
+                foreach ($datas as $data) {
+                    //Se obtiene el n de la clase
+                    $n = $data['n'];
+                    //Se calcula la propierad a priori de la clase en cuestión
+                    $probabilidadPriori = $n/$m;
+                    $result = 1;
+                    //Se obtiene la productoria de los valores obtenidos de las ocurrencias para los valores de una determinada clase. 
+                    for ($i=1; $i<count($keyRecintoEstilo); $i++) {
+                        $p = $indiceEstilosRecinto[$keyRecintoEstilo[$i]];                        
+                        //Se calcula la formula por medio de bayes/naive
+                        $result *= ($data[$keyRecintoEstilo[$i]]+($m*$p)) / ($n+$m);
+                    }        
+                    //Se calcula el valor de la productoria de la clase por el valor de la probabilidad a priori
+                    $result = $result * $probabilidadPriori;                                           
+                    //Se determina el valor máximo 
+                    if ($temp < $result) {
                         $temp = $result;
-                        //Se almacena temporal mente el estilo recuperado. 
+                        //Es encontrado el valor de la clase que corresponde. 
                         $estilo = $data['Estilo'];
                     }
-                }   
+                }                        
+                //Variable para mostrarlo en pantalla                                             
                 $activarJQuery = true;      
             }   
             include 'view/ingresarEstilos.php';
@@ -56,78 +73,93 @@ class DefaultController {
         } elseif (isset($_GET['recinto'])) {
             //Cuando se calcula el resultado esperado del recinto
             if (isset($_GET['calcularRecinto'])){
-                $temp = 100000000.0;                
-                //Se obtienen los registros almacenados en la tabla de la base de datos. 
-                $datas = $this->model->obtenerRecinto(); 
-                //Se compara cada valor obtenido de la base de datos. 
+                //Se obtiene el indice resumen de los datos de la tabla recintoestilo
+                $indices = $this->model->obtenerIndiceSexoRecintoPromedio();                
+                //Se obtienen las variables del formulario ingresadas por el usuario
+                $tipoAprendizaje = $_POST['estilo'];
+                $promedio = $_POST['promedio'];
+                $sexo = $_POST['sexo'];
+                //Se obtienen los datos de la table de la base de datos
+                $datas = $this->model->obtenerRecinto($sexo, $promedio, $tipoAprendizaje);                
+                //Se calcula para cada valor recuperado
+                 //Se obtienen los porcentajes del indice
+                 $indiceRecinto = $indices[0];
+                 //Se obtiene el m de la formula
+                 $m = $indiceRecinto['m'];   
+                 //Inicialización de variables de control             
+                 $temp = 0;
+                 $recinto = '';
+                 //Arreglo con los valores key de la tabla de la base de datos 
+                 $keyRecinto = array('Sexo', 'Promedio', 'Estilo');
+                 //Se recorren los valores para cada clase
                 foreach ($datas as $data){
-                    //Se convierte el valor obtenido del campo estilo por valores números para poder comprarlo.
-                    switch($data['Estilo']){
-                        case "DIVERGENTE": 
-                            $valorEstilobd = 1;
-                            break;
-                        case "CONVERGENTE": 
-                            $valorEstilobd = 2;
-                            break;
-                        case "ASIMILADOR":
-                            $valorEstilobd = 3; 
-                            break;
-                        case "ACOMODADOR":
-                            $valorEstilobd = 4; 
-                            break;
-                    }   
-                    //Se convierte a un valor numérico el campo del sexo
-                    $valorSexoDB = $data['Sexo'] == "M" ? 1: 2;         
-                    //Se calcula el resultado de la distancia euclidiana para cada campo           
-                    $result = sqrt(pow($_POST['estilo'] - $valorEstilobd, 2) + pow($_POST['sexo'] - $valorSexoDB, 2) + pow($data['Promedio'] - $_POST['promedio'],2));
-                    //Se obtiene el valor mínimo                    
-                    if($result<$temp){
+                    //Se obtiene el n de la clase
+                    $n = $data['n'];
+                    //Se calcula la propierad a priori de la clase en cuestión
+                    $probabilidadPriori = $n/$m;
+                    $result = 1;
+                    //Se obtiene la productoria de los valores obtenidos de las ocurrencias para los valores de una determinada clase. 
+                    for ($i=1; $i<count($keyRecinto); $i++) {
+                        $p = $indiceRecinto[$keyRecinto[$i]];                        
+                        //Se calcula la formula por medio de bayes/naive
+                        $result *= ($data[$keyRecinto[$i]]+($m*$p)) / ($n+$m);
+                    }        
+                    //Se calcula el valor de la productoria de la clase por el valor de la probabilidad a priori
+                    $result = $result * $probabilidadPriori;                                           
+                    //Se determina el valor máximo 
+                    if ($temp < $result) {
                         $temp = $result;
-                        //Se almacena temporalmente el recinto.
+                        //Es encontrado el valor de la clase que corresponde. 
                         $recinto = $data['Recinto'];
                     }
-                }        
-                $activarJQuery = true;         
-                
+                }                    
+                $activarJQuery = true;  
             }  
             include 'view/obtenerRecinto.php';       
             //Se activa cuando se llama la vista del ejecicio 3.3     
         } elseif (isset($_GET['sexo'])) {
             //Cuando se va a calcular el valor del sexo equivalente
-            if (isset($_GET['calcularSexo'])){
-                //Variable inicializada en un valor alto para obtener el valor mínimo
-                $temp = 100000000.0;                
+            if (isset($_GET['calcularSexo'])){                
+                //Se obtiene el indice resumen de los datos de la tabla recintoestilo
+                $indices = $this->model->obtenerIndiceSexoRecintoPromedio();                
+                //Se obtienen las variables del formulario ingresadas por el usuario
+                $tipoAprendizaje = $_POST['estilo'];
+                $promedio = $_POST['promedio'];
+                $recinto = $_POST['recinto'];
                 //Se obtienen los datos de la table de la base de datos
-                $datas = $this->model->obtenerRecinto(); 
+                $datas = $this->model->obtenerSexo($recinto, $promedio, $tipoAprendizaje);                
                 //Se calcula para cada valor recuperado
+                 //Se obtienen los porcentajes del indice
+                 $indiceSexo = $indices[0];
+                 //Se obtiene el m de la formula
+                 $m = $indiceSexo['m'];   
+                 //Inicialización de variables de control             
+                 $temp = 0;
+                 $sexo = '';
+                 //Arreglo con los valores key de la tabla de la base de datos 
+                 $keySexo = array('Recinto', 'Promedio', 'Estilo');
+                 //Se recorren los valores para cada clase
                 foreach ($datas as $data){
-                    //Se convierte el estilo a un valor numérico para comparar.
-                    switch($data['Estilo']){
-                        case "DIVERGENTE": 
-                            $valorEstilobd = 1;
-                            break;
-                        case "CONVERGENTE": 
-                            $valorEstilobd = 2;
-                            break;
-                        case "ASIMILADOR":
-                            $valorEstilobd = 3; 
-                            break;
-                        case "ACOMODADOR":
-                            $valorEstilobd = 4; 
-                            break;
-                    }   
-                    //Se convierte el recinto a un valor numérico para compararlo 
-                    $valorRecintoDB = $data['Recinto'] == "Paraiso" ? 1: 2;      
-                    //Se calcula la distancia euclidiana              
-                    $result = sqrt(pow($_POST['estilo'] - $valorEstilobd, 2) + pow($_POST['recinto'] - $valorRecintoDB, 2) + pow($data['Promedio'] - $_POST['promedio'],2));
-                    //Se obtiene el valor mínimo
-                    
-                    if($result<$temp){
+                    //Se obtiene el n de la clase
+                    $n = $data['n'];
+                    //Se calcula la propierad a priori de la clase en cuestión
+                    $probabilidadPriori = $n/$m;
+                    $result = 1;
+                    //Se obtiene la productoria de los valores obtenidos de las ocurrencias para los valores de una determinada clase. 
+                    for ($i=1; $i<count($keySexo); $i++) {
+                        $p = $indiceSexo[$keySexo[$i]];                        
+                        //Se calcula la formula por medio de bayes/naive
+                        $result *= ($data[$keySexo[$i]]+($m*$p)) / ($n+$m);
+                    }        
+                    //Se calcula el valor de la productoria de la clase por el valor de la probabilidad a priori
+                    $result = $result * $probabilidadPriori;                                           
+                    //Se determina el valor máximo 
+                    if ($temp < $result) {
                         $temp = $result;
-                        //Se almacena el sexo temporalmente hasta alcanzar el mínimo
-                        $sexo = $data['Sexo'] == "M"? "Masculino" : "Femenino";                        
+                        //Es encontrado el valor de la clase que corresponde. 
+                        $sexo = $data['Sexo'] == 'M' ? 'Masculino' : 'Femenino';
                     }
-                }        
+                }                    
                 $activarJQuery = true;         
             } 
             include 'view/calcularSexo.php';
@@ -135,25 +167,47 @@ class DefaultController {
         } elseif (isset($_GET['obtenerEstilo'])) {
             //Cuando se va a calcular el estilo
             if (isset($_GET['calcularEstilo'])){                
-                $temp = 100000000.0;            
-                //Se obtienen los datos de la tabla de la base de datos     
-                $datas = $this->model->obtenerRecinto(); 
-                //Se compara para cada valor recuperado
+                //Se obtiene el indice resumen de los datos de la tabla recintoestilo
+                $indices = $this->model->obtenerIndiceSexoRecintoPromedio();                
+                //Se obtienen las variables del formulario ingresadas por el usuario
+                $sexo = $_POST['sexo'];
+                $promedio = $_POST['promedio'];
+                $recinto = $_POST['recinto'];
+                //Se obtienen los datos de la table de la base de datos
+                $datas = $this->model->obtenerEstilo($sexo, $recinto, $promedio);                
+                //Se calcula para cada valor recuperado
+                 //Se obtienen los porcentajes del indice
+                 $indiceEstilo = $indices[0];
+                 //Se obtiene el m de la formula
+                 $m = $indiceEstilo['m'];   
+                 //Inicialización de variables de control             
+                 $temp = 0;
+                 $estilo = '';
+                 //Arreglo con los valores key de la tabla de la base de datos 
+                 $keySexo = array('Sexo', 'Recinto', 'Promedio');
+                 //Se recorren los valores para cada clase
                 foreach ($datas as $data){
-                    //Se convierte el valor del sexo para un valor numérico para que sea más fácil de comparar. 
-                    $valorSexoDB = $data['Sexo'] == "M" ? 1 : 2;   
-                    //Se convierte el valor del recinto por un valor numérico para que sea más fácil de comparar.
-                    $valorRecintoDB = $data['Recinto'] == "Paraiso" ? 1: 2;                    
-                    //Se calcula la distancia euclidiana
-                    $result = sqrt(pow($_POST['sexo'] - $valorSexoDB, 2) + pow($_POST['recinto'] - $valorRecintoDB, 2) + pow($data['Promedio'] - $_POST['promedio'],2));
-                    //Se compara el valor mínimo                    
-                    if($result<$temp){
+                    //Se obtiene el n de la clase
+                    $n = $data['n'];
+                    //Se calcula la propierad a priori de la clase en cuestión
+                    $probabilidadPriori = $n/$m;
+                    $result = 1;
+                    //Se obtiene la productoria de los valores obtenidos de las ocurrencias para los valores de una determinada clase. 
+                    for ($i=1; $i<count($keySexo); $i++) {
+                        $p = $indiceEstilo[$keySexo[$i]];                        
+                        //Se calcula la formula por medio de bayes/naive
+                        $result *= ($data[$keySexo[$i]]+($m*$p)) / ($n+$m);
+                    }        
+                    //Se calcula el valor de la productoria de la clase por el valor de la probabilidad a priori
+                    $result = $result * $probabilidadPriori;                                           
+                    //Se determina el valor máximo 
+                    if ($temp < $result) {
                         $temp = $result;
-                        //Se almacena el estilo temporalmente hasta alcanzar el valor minimo
-                        $sexo = $data['Estilo'];
+                        //Es encontrado el valor de la clase que corresponde. 
+                        $estilo = $data['Estilo'];
                     }
-                }        
-                $activarJQuery = true;         
+                }                    
+                $activarJQuery = true;   
             }
             include 'view/obetenerEstilo.php';
             //Se activa cuando se solicita la vista del ejercicio 3.5

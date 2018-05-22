@@ -27,8 +27,8 @@ Debe de seleccionar su recinto, su último promedio de matrícula y su sexo</fon
             <tr>
                 <td>
                     <select name="sexo" class="form-control" style="float:left">
-                        <option value="1">Masculino</option>
-                        <option value="2">Femenino</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
                     </select>
                 </td>
                 <td>
@@ -36,8 +36,8 @@ Debe de seleccionar su recinto, su último promedio de matrícula y su sexo</fon
                 </td>
                 <td>
                     <select name="recinto" class="form-control" style="float:left">
-                        <option value="1">Paraíso</option>
-                        <option value="2">Turrialba</option>    
+                        <option value="Paraiso">Paraíso</option>
+                        <option value="Turrialba">Turrialba</option>    
                     </select>
                 </td>                
             </tr>
@@ -47,9 +47,9 @@ Debe de seleccionar su recinto, su último promedio de matrícula y su sexo</fon
         <input value="Calcular" type="submit" class="btn btn-primary" style="width: 15%; float: left;" id="enviar">
         <label  style="float: left; width: 20%;">Estilo de aprendizaje</label>
         <?php 
-            if(isset($sexo)){
+            if(isset($estilo)){
                 ?>
-            <input maxlength="12" size="12" name="ESTILOFINAL" class="form-control" style="width:20%;" value="<?php echo $sexo; ?>">    
+            <input maxlength="12" size="12" name="ESTILOFINAL" class="form-control" style="width:20%;" value="<?php echo $estilo; ?>">    
             <?php
             }
         ?>   

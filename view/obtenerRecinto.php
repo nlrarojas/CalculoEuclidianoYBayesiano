@@ -27,10 +27,10 @@ Debe de seleccionar su estilo de aprendizaje de los cuatro usados su último pro
             <tr>
                 <td>
                     <select name="estilo" class="form-control" style="float:left">
-                        <option value="1">Divergente</option>
-                        <option value="2">Convergente</option>
-                        <option value="3">Asimilador</option>
-                        <option value="4">Acomodar</option>
+                        <option value="DIVERGENTE">Divergente</option>
+                        <option value="CONVERGENTE">Convergente</option>
+                        <option value="ASIMILADOR">Asimilador</option>
+                        <option value="ACOMODADOR">Acomodar</option>
                     </select>
                 </td>
                 <td>
@@ -38,8 +38,8 @@ Debe de seleccionar su estilo de aprendizaje de los cuatro usados su último pro
                 </td>
                 <td>
                     <select name="sexo" class="form-control" style="float:left">
-                        <option value="1">Masculino</option>
-                        <option value="2">Femenino</option>    
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>    
                     </select>
                 </td>                
             </tr>
